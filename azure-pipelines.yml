@@ -10,10 +10,11 @@ pool:
   vmImage: windows-latest
 
 steps:
+
 - task: CmdLine@2
   displayName: Build      
   inputs:
-    script: 'docker buildx bake'
+    script: 'make -f docker.Makefile shell'
     workingDirectory: '$(Build.SourcesDirectory)'
 - task: CopyPublishBuildArtifacts@1
   displayName: Publish      
