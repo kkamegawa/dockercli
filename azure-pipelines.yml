@@ -7,17 +7,19 @@ trigger:
 - master
 
 pool:
-  vmImage: windows-2022
+  vmImage: windows-latest
 
 jobs:
   - job: 'build'
     displayName: Build
     pool:
-      vmImage: windows-2022
+      vmImage: windows-latest
       steps:
+      
       - task: CmdLine@2
         inputs:
           script: 'docker buildx bake'
+          workingDirectory: '$(Build.SourcesDirectory)'
       - task: CopyPublishBuildArtifacts@1
         inputs:
           CopyRoot: '$(Build.SourcesDirectory)/build'
