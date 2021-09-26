@@ -9,21 +9,16 @@ trigger:
 pool:
   vmImage: windows-latest
 
-jobs:
-  - job: 'build'
-    displayName: Build
-    pool:
-      vmImage: windows-latest
-      steps:
-      - task: CmdLine@2
-        displayName: Build      
-        inputs:
-          script: 'docker buildx bake'
-          workingDirectory: '$(Build.SourcesDirectory)'
-      - task: CopyPublishBuildArtifacts@1
-        displayName: Publish      
-        inputs:
-          CopyRoot: '$(Build.SourcesDirectory)/build'
-          Contents: '*.exe'
-          ArtifactName: 'drop'
-          ArtifactType: 'Container'
+steps:
+- task: CmdLine@2
+  displayName: Build      
+  inputs:
+    script: 'docker buildx bake'
+    workingDirectory: '$(Build.SourcesDirectory)'
+- task: CopyPublishBuildArtifacts@1
+  displayName: Publish      
+  inputs:
+    CopyRoot: '$(Build.SourcesDirectory)/build'
+    Contents: '*.exe'
+    ArtifactName: 'drop'
+    ArtifactType: 'Container'
