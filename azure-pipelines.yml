@@ -1,0 +1,26 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: windows-2022
+
+jobs:
+  - job: 'build'
+    displayName: Build
+    pool:
+      vmImage: windows-2022
+      steps:
+      - task: CmdLine@2
+        inputs:
+          script: 'docker buildx bake'
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          CopyRoot: '$(Build.SourcesDirectory)/build'
+          Contents: '*.exe'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
