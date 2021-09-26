@@ -15,12 +15,13 @@ jobs:
     pool:
       vmImage: windows-latest
       steps:
-      
       - task: CmdLine@2
+        displayName: Build      
         inputs:
           script: 'docker buildx bake'
           workingDirectory: '$(Build.SourcesDirectory)'
       - task: CopyPublishBuildArtifacts@1
+        displayName: Publish      
         inputs:
           CopyRoot: '$(Build.SourcesDirectory)/build'
           Contents: '*.exe'
