@@ -10,11 +10,30 @@ pool:
   vmImage: windows-latest
 
 steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $latestRelease = Invoke-WebRequest https://github.com/docker/buildx/releases/latest -Headers @{"Accept"="application/json"}
+      $json = $latestRelease.content | ConvertFrom-Json
+      $latestVersion = $json.tag_name
+      
+      $outputFolder = [environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath '.docker' | Join-Path -ChildPath 'cli-plugins'
+      new-item -ItemType Directory -Path $outputFolder -Force
+      $outputPath = Join-Path $outputFolder -ChildPath 'docker-buildx.exe'
+      
+      $url = "https://github.com/docker/buildx/releases/download/$latestVersion/buildx-$latestVersion.windows-amd64.exe"
+      Invoke-WebRequest $url -OutFile $outputPath
+    showWarnings: true
+    pwsh: true
+- task: CmdLine@2
+  inputs:
+    script: 'docker buildx install'
 
 - task: CmdLine@2
   displayName: Build      
   inputs:
-    script: 'make -f docker.Makefile shell'
+    script: 'docker buildx bake --set binary.platform=windows/amd64 '
     workingDirectory: '$(Build.SourcesDirectory)'
 - task: CopyPublishBuildArtifacts@1
   displayName: Publish      
@@ -23,3 +42,7 @@ steps:
     Contents: '*.exe'
     ArtifactName: 'drop'
     ArtifactType: 'Container'
+
+- task: CmdLine@2
+  inputs:
+    script: 'docker buildx uninstall'
